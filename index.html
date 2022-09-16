@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Form</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        
+        .heading {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .box {
+            border-radius: 10px;
+            width: 100vw;
+            color: aliceblue;
+            background-color: skyblue;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 700px;
+            ;
+        }
+        
+        .entries {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+            background-color: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <form class="form" id="form">
+            <h2>Registration Form</h2>
+
+            <table class="tableForm" cellspacing="25px">
+                <tr>
+                    <td><label for="name">Name</label></td>
+                    <td>
+                        <input class="input" type="text" name="name" id="name" placeholder="Full Name" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="email">Email</label></td>
+                    <td>
+                        <input class="input" type="email" name="email" id="email" placeholder="Email" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="name">Password</label></td>
+                    <td>
+                        <input class="input" type="password" name="password" id="password" placeholder="Password" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="dateofbirth">Date Of Birth</label></td>
+                    <td>
+                        <input class="input" type="date" name="dateofbirth" id="dateofbirth" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="checkbox" name="terms" id="terms" />
+                        <label for="checkbox">terms and conditions</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="btn" type="submit">Submit</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div class="entries">
+        <h2>Details</h2>
+        <div id="entries_tbl"></div>
+    </div>
+</body>
+<script>
+    let form = document.getElementById("form");
+
+
+    const retriveEntries = () => {
+        let entries = localStorage.getItem("userEntry");
+
+        if (entries) {
+            entries = JSON.parse(entries);
+        } else {
+            entries = [];
+        }
+        return entries;
+    };
+
+    let Entries = retriveEntries();
+
+    const displayEntries = () => {
+        const entries = retriveEntries();
+
+        const rows = entries
+            .map((entry) => {
+                const name = `<td class="td">${entry.name}</td>`;
+                const email = `<td class="td">${entry.email}</td>`;
+                const password = `<td class="td">${entry.password}</td>`;
+                const dateofbirth = `<td class="td">${entry.dateofbirth}</td>`;
+                const terms = `<td class="td">${entry.terms}</td>`;
+
+                const row = `<tr>${name} ${email} ${password} ${dateofbirth} ${terms}</tr>`;
+                return row;
+            })
+            .join("\n");
+
+        let entries_tbl = document.getElementById("entries_tbl");
+
+        entries_tbl.innerHTML = `<table class="table" border="2">
+      <tr>
+        <th class="th">Name</th>
+        <th class="th">Email</th>
+        <th class="th">Password</th>
+        <th class="th">dateofbirth</th>
+        <th class="th">terms</th>
+      </tr>
+        ${rows}
+      </table>`;
+    };
+    const saveUserFrom = (event) => {
+        event.preventDefault();
+
+        let name = document.getElementById("name").value;
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+        let dateofbirth = document.getElementById("dateofbirth").value;
+        let terms = document.getElementById("terms").checked;
+
+        let entry_obj = {
+            name,
+            email,
+            password,
+            dateofbirth,
+            terms,
+        };
+
+        Entries.push(entry_obj);
+
+        localStorage.setItem("userEntry", JSON.stringify(Entries));
+
+        displayEntries();
+    };
+
+    form.addEventListener("submit", saveUserFrom);
+
+    displayEntries();
+
+    let dateofbirth = document.getElementById("dateofbirth");
+    dateofbirth.addEventListener("change", () => {
+        const dateofbirth = document.getElementById("dateofbirth").value;
+        let current_date = new Date();
+        let year = current_date.getFullYear();
+        const age = Math.abs(new Date(dateofbirth).getUTCFullYear() - year);
+        if (age < 18 || age > 55) {
+            dateofbirth.setCustomValidity("Your age is not in between 18 and 55");
+            dateofbirth.style.border = "2px solid red";
+            return;
+        } else {
+            dateofbirth.setCustomValidity("");
+        }
+    });
+
+    const email = document.getElementById("email");
+    email.addEventListener("input", () => {
+        if (email.validity.typeMismatch) {
+            email.setCustomValidity("Please enter the email in the required format");
+            email.reportValidity();
+        } else {
+            email.setCustomValidity("");
+        };
+    });
+</script>
+
+</html>
